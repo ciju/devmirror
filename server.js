@@ -16,100 +16,140 @@ var WebSocket = require('faye-websocket');
 var http      = require('http');
 var fs        = require('fs');
 
+// TODO: pickup from environment?
+var HOSTROOEXP = '.localtunnel.net:8080';
+var PORT = 8080;
+
 var server = http.createServer();
 
-fs.readFile('mirror.html', function(err, mirrorHTML) {
-  fs.readFile('mirror.js', function(err, mirrorJS) {
-    fs.readFile('tree_mirror.js', function(err, treeMirrorJS) {
+function L() {
+  if (console && console.log) {
+    console.log.apply(console, arguments);
+  }
+}
 
-      server.addListener('request', function(request, response) {
-        if (request.url == '/mirror.html' || request.url == '/' || request.url == '/index.html') {
-          response.writeHead(200, {'Content-Type': 'text/html'});
-          response.end(mirrorHTML);
-          return;
-        }
+var files = {
+  'mirror.html': ['/mirror.html', 'text/html', null],
+  'mirror.js': ['/mirror.js', 'text/javascript', null],
+  'tree_mirror.js': ['/tree_mirror.js', 'text/javascript', null],
+  'app.js': ['/app.js', 'text/javascript', null],
+  'app.css': ['/app.css', 'text/css', null]
+};
 
-        if (request.url == '/mirror.js') {
-          response.writeHead(200, {'Content-Type': 'text/javascript'});
-          response.end(mirrorJS);
-          return;
-        }
-
-        if (request.url == '/tree_mirror.js') {
-          response.writeHead(200, {'Content-Type': 'text/javascript'});
-          response.end(treeMirrorJS);
-          return;
-        }
-
-        console.error('unknown resource: ' + request.url);
-      });
+// TODO: if this doesn't finish before server gets a request, then we
+// might have a problem.
+for (var file in files) {
+  (function (f) {
+    fs.readFile(f, function (err, content) {
+      files[f][2] = content;
+      L('read file - ' + f);
     });
+  })(file);
+}
+
+fs.readFile('index.html', function (err, indexHTML) {
+  server.addListener('request', function (request, response) {
+    for (var f in files) {
+      if (request.url == files[f][0]) {
+        response.writeHead(200, {'Content-Type': files[1]});
+        response.end(files[f][2]);
+        return;
+      }
+    }
+
+    if (request.url == '/' || request.url == '/index.html') {
+      response.writeHead(200, {'Content-Type': 'text/html'});
+      if (! request.headers.host) {
+        return;
+      }
+      L("host - ", request.headers.host, request.headers.host.split(":")[0]);
+      response.end((indexHTML+"").replace("{{host}}", request.headers.host.split(":")[0]));
+      return;
+    }
+
+    L('Unknown resource: ' + request.url);
   });
 });
 
-var messages = [];
-var receivers = [];
-var projector;
+var projectors = [];
 
 server.addListener('upgrade', function(request, rawsocket, head) {
   var socket = new WebSocket(request, rawsocket, head);
+  var id = "",
+      proj;
+
+  if (request.headers.host) {
+    id = request.headers.host.replace(HOSTROOEXP, '');
+  }
+  L("host: ", request.headers.host);
 
   // Projector.
   if (request.url == '/projector') {
-    console.log('projector connection initiating.');
+    L('PROJ: connection initiating.', id);
 
-    if (projector) {
-      console.log('closing existing projector. setting messages to 0');
-      projector.close();
-      messages.length = 0;
+    if (projectors[id]) {
+      projectors[id].messages.length = 0;
+    } else {
+      projectors[id] = {messages: [], receivers: []};
     }
 
-    projector = socket;
+    proj = projectors[id];
+    L("PROJ: receiver cnt: ", proj.receivers.length);
 
-    messages.push(JSON.stringify({ clear: true }));
+    proj.projector = socket;
 
-    receivers.forEach(function(socket) {
-      socket.send(messages[0]);
+
+
+    proj.messages.push(JSON.stringify({ clear: true }));
+
+    proj.receivers.forEach(function(socket) {
+      socket.send(proj.messages[0]);
     });
 
 
     socket.onmessage = function(event) {
-      console.log('message received. now at ' + messages.length + ' . sending to ' + receivers.length);
-      receivers.forEach(function(receiver) {
+      L('PROJ: message received. now at ' +
+                  proj.messages.length +
+                  ' . sending to ' + proj.receivers.length);
+      proj.receivers.forEach(function(receiver) {
         receiver.send(event.data);
       });
 
-      messages.push(event.data);
+      proj.messages.push(event.data);
     };
 
     socket.onclose = function() {
-      console.log('projector closing, clearing messages');
-      messages.length = 0;
-      receivers.forEach(function(socket) {
-        socket.send(JSON.stringify({ clear: true }));
-      });
+      L('PROJ: projector closing, clearing messages');
+      proj.messages.length = 0;
+    };
 
-      projector = undefined;
-    }
-
-    console.log('projector open completed.')
+    L('PROJ: projector open completed.');
     return;
   }
 
   // Receivers.
   if (request.url == '/receiver') {
-    receivers.push(socket);
+    L("RECV: receiver for id: ", id);
+    if (!projectors[id]) {
+      projectors[id] = {messages: [], receivers: []};
+    }
+    proj = projectors[id];
 
-    console.log('receiver opened. now at ' + receivers.length + ' sending ' + messages.length + ' messages');
-    socket.send(JSON.stringify(messages));
+    proj.receivers.push(socket);
+
+    L('RECV: receiver opened. now at ' + proj.receivers.length +
+                ' sending ' + proj.messages.length + ' messages');
+    socket.send(JSON.stringify(proj.messages));
 
 
     socket.onclose = function() {
-      var index = receivers.indexOf(socket);
-      receivers.splice(index, 1);
-      console.log('receiver closed. now at ' + receivers.length);
-    }
+      var index = proj.receivers.indexOf(socket);
+      proj.receivers.splice(index, 1);
+      L('RECV: closed. now at ' + proj.receivers.length);
+    };
   }
 });
 
-server.listen(8080);
+// TODO: get the port from console
+server.listen(PORT);
+L("Server started on port " + PORT);
