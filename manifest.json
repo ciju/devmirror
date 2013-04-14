@@ -15,7 +15,6 @@
     "default_icon": "icon_128.png"
   },
   "background": {
-    "scripts": ["bg.js"],
-    "persistent": false
+    "scripts": ["bg.js"]
   }
 }
