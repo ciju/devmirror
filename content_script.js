@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var serverURL = 'ws://localhost:8080/projector';
+var serverURL = 'ws://c.lt.dev:8080/projector';
 
 var socket;
 
@@ -20,14 +20,27 @@ function socketSend(msg) {
   socket.send(JSON.stringify(msg));
 }
 
-window.addEventListener('load', function() {
+var xhr = new XMLHttpRequest();
+xhr.open("GET", "http://localhost:17171", true);
+xhr.onreadystatechange = function() {
+  if (xhr.readyState == 4) {
+    // JSON.parse does not evaluate the attacker's scripts.
+    serverURL = xhr.responseText;
+
+    serverURL = 'ws://'+serverURL+'/projector';
+    window.addEventListener('load', onLoad);
+  }
+};
+xhr.send();
+
+function onLoad() {
   chrome.extension.sendMessage({ mirror : true}, function(response) {
     if (response.mirror)
       startMirroring();
     else
       stopMirroring();
   });
-});
+}
 
 function startMirroring() {
   if (socket)
@@ -53,12 +66,12 @@ function startMirroring() {
         });
       }
     });
-  }
+  };
 
   socket.onclose = function() {
     mirrorClient.disconnect();
     socket = undefined;
-  }
+  };
 }
 
 function stopMirroring() {
