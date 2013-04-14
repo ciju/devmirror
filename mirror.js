@@ -12,28 +12,43 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+function L() {
+  if (window.console && console.log) {
+    console.log.apply(console, arguments);
+  }
+}
+
+function W() {
+  if (window.console && console.warn)  {
+    console.warn.apply(console, arguments);
+  }
+}
+
 var receiverURL = 'ws://' + location.host + '/receiver';
 
-window.addEventListener('DOMContentLoaded', function() {
+function startMirror() {
   var base;
 
   var mirror = new TreeMirror(document, {
     createElement: function(tagName) {
+      var node;
       if (tagName == 'SCRIPT') {
-        var node = document.createElement('NO-SCRIPT');
+        node = document.createElement('NO-SCRIPT');
         node.style.display = 'none';
         return node;
       }
 
       if (tagName == 'HEAD') {
-        var node = document.createElement('HEAD');
+        node = document.createElement('HEAD');
         node.appendChild(document.createElement('BASE'));
         node.firstChild.href = base;
         return node;
       }
+      return null;
     }
   });
 
+  L("receiverURL: ", receiverURL);
   var socket = new WebSocket(receiverURL);
 
   function clearPage() {
@@ -43,12 +58,16 @@ window.addEventListener('DOMContentLoaded', function() {
   }
 
   function handleMessage(msg) {
-    if (msg.clear)
+    if (msg.clear) {
+      W('clearing page');
       clearPage();
-    else if (msg.base)
+    } else if (msg.base) {
+      W('setting base');
       base = msg.base;
-    else
+    } else {
+      W('mirroring', msg.f, msg.args.length);
       mirror[msg.f].apply(mirror, msg.args);
+    }
   }
 
   socket.onmessage = function(event) {
@@ -60,9 +79,9 @@ window.addEventListener('DOMContentLoaded', function() {
     } else {
       handleMessage(msg);
     }
-  }
+  };
 
   socket.onclose = function() {
     socket = new WebSocket(receiverURL);
-  }
-});
+  };
+}
