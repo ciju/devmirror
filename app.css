@@ -1,0 +1,47 @@
+body,html{width:100%;height:100%;padding:0;margin:0;}
+#top-div{
+   position: absolute;
+   top: 0;
+   width:100%;
+   height: 50%;
+}
+#bottom-div{
+   position: absolute;
+   top: 50%;
+   width: 100%;
+   height: auto;
+   bottom: 0;
+}
+#dragbar{
+   background-color: black;
+   position: absolute;
+   bottom: 0;
+   width:100%;
+   height: 3px;
+   cursor: row-resize;
+}
+
+.over {
+   z-index: 1000;
+   position: absolute;
+   top:0;
+   width: 100%;
+   height: 100%;
+}
+
+.cover {
+   z-index: 900;
+   position: absolute;
+   background-color: lightgray;
+   top: 0;
+   width: 100%;
+   height: 100%;
+   margin: 0 auto;
+   opacity: 0;
+}
+
+.cover p {
+   font-size: 40px;
+   padding: 40px;
+   text-align: center;
+}
