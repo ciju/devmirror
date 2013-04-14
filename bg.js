@@ -12,46 +12,52 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var mirroring = false;
+var mirroring = true;
 var activeTab;
 var windowId;
 
-chrome.browserAction.onClicked.addListener(function(tab) {
-  if (mirroring) {
-    chrome.tabs.executeScript(activeTab, { code: 'stopMirroring();' });
-    mirroring = false;
-    activeTab = undefined;
-    windowId = undefined;
-  } else {
-    mirroring = true;
-    windowId = tab.windowId;
-    mirrorTab(tab.id);
-  }
+function a(s) {
+  // alert(s);
+}
+
+chrome.tabs.getCurrent(function (tab) {
+  a("curr tab: " + tab.id + ' - ' + tab.active);
+  if (!tab.active) return;
+  a("mirroring "+ tab.id);
+  windowId = tab.windowId;
+  mirrorTab(tab.id, windowId);
 });
 
-function mirrorTab(tabId) {
-  if (tabId == activeTab)
-    return;
+function mirrorTab(tabId, wId, force) {
+  a("mirroring " + tabId + ' ac ' + activeTab);
 
-  if (activeTab)
+  if (tabId != activeTab)
     chrome.tabs.executeScript(activeTab, { code: 'stopMirroring();' });
 
   activeTab = tabId;
+  windowId = wId;
 
   chrome.tabs.executeScript(activeTab, { code: 'startMirroring();' });
 }
 
-chrome.tabs.onActiveChanged.addListener(function(tabId, selectInfo) {
-  if (!mirroring)
-    return;
+chrome.tabs.onActivated.addListener(function(selectInfo) {
+  a('onactivechange: mrr ' + mirroring + ' win ' +
+        selectInfo.windowId + ' cmp ' + windowId +
+        '  tab ' + selectInfo.tabId
+       );
 
-  if (selectInfo.windowId != windowId)
-    return;
+  mirrorTab(selectInfo.tabId, selectInfo.windowId);
+});
 
-  mirrorTab(tabId);
+chrome.tabs.onUpdated.addListener(function (tid, changeInfo, tab) {
+  if (changeInfo.status == 'complete') {
+    a('updated ' + changeInfo.status);
+    mirrorTab(tid, tab.windowId, true);
+  }
 });
 
 chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
+  a('mirror : '+ mirroring + ' - tab - ' + sender.tab.id + ' - ac - ' + activeTab);
   if (!mirroring || sender.tab.id !== activeTab)
     sendResponse({ mirror: false });
   else
