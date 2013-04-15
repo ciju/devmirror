@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var serverURL = 'ws://c.lt.dev:8080/projector';
-
 var socket;
 
 function socketSend(msg) {
@@ -25,24 +23,26 @@ xhr.open("GET", "http://localhost:17171", true);
 xhr.onreadystatechange = function() {
   if (xhr.readyState == 4) {
     // JSON.parse does not evaluate the attacker's scripts.
-    serverURL = xhr.responseText;
+    var serverURL = xhr.responseText;
 
     serverURL = 'ws://'+serverURL+'/projector';
-    window.addEventListener('load', onLoad);
+    window.addEventListener('load', function () {
+      onLoad(serverURL);
+    });
   }
 };
 xhr.send();
 
-function onLoad() {
+function onLoad(serverURL) {
   chrome.extension.sendMessage({ mirror : true}, function(response) {
     if (response.mirror)
-      startMirroring();
+      startMirroring(serverURL);
     else
       stopMirroring();
   });
 }
 
-function startMirroring() {
+function startMirroring(serverURL) {
   if (socket)
     return;
 
