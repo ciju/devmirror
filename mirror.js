@@ -85,3 +85,8 @@ function startMirror() {
     socket = new WebSocket(receiverURL);
   };
 }
+
+window.onload = function () {
+  L("registering as receiver for dom mirroring");
+  startMirror();
+};
