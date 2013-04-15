@@ -51,7 +51,7 @@ fs.readFile('index.html', function (err, indexHTML) {
   server.addListener('request', function (request, response) {
     for (var f in files) {
       if (request.url == files[f][0]) {
-        response.writeHead(200, {'Content-Type': files[1]});
+        response.writeHead(200, {'Content-Type': files[f][1]});
         response.end(files[f][2]);
         return;
       }
