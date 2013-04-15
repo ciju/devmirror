@@ -57,13 +57,29 @@ function startMirror() {
     }
   }
 
+  // do better
+  var queue = [], i=0;
+  var cursor = window.top.document.getElementById('cursor');
+  W(' -- cursor', cursor);
+
+  setInterval(function () {
+    if (i < queue.length) {
+      cursor.style.left = queue[i][0] + "px";
+      cursor.style.top = queue[i][1] + "px";
+      window.scrollTo(queue[i][2], queue[i][3]);
+      i++;
+    }
+  }, 100);
+
   function handleMessage(msg) {
-    if (msg.clear) {
-      W('clearing page');
-      clearPage();
+    if (msg.mouse) {
+      queue.push(msg.mouse);
     } else if (msg.base) {
       W('setting base');
       base = msg.base;
+    } else if (msg.clear) {
+      W('clearing page');
+      clearPage();
     } else {
       W('mirroring', msg.f, msg.args.length);
       mirror[msg.f].apply(mirror, msg.args);

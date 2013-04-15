@@ -33,7 +33,8 @@ var files = {
   'mirror.js': ['/mirror.js', 'text/javascript', null],
   'tree_mirror.js': ['/tree_mirror.js', 'text/javascript', null],
   'app.js': ['/app.js', 'text/javascript', null],
-  'app.css': ['/app.css', 'text/css', null]
+  'app.css': ['/app.css', 'text/css', null],
+  'public/cursor.png': ['/cursor.png', 'image/png', null]
 };
 
 // TODO: if this doesn't finish before server gets a request, then we
@@ -97,8 +98,6 @@ server.addListener('upgrade', function(request, rawsocket, head) {
     L("PROJ: receiver cnt: ", proj.receivers.length);
 
     proj.projector = socket;
-
-
 
     proj.messages.push(JSON.stringify({ clear: true }));
 

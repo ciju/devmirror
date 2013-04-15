@@ -66,6 +66,10 @@ function startMirroring(serverURL) {
         });
       }
     });
+
+    recMouseScroll(function (arr) {
+      socketSend({ mouse: arr });
+    });
   };
 
   socket.onclose = function() {
