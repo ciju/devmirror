@@ -62,21 +62,51 @@ function startMirror() {
   var cursor = window.top.document.getElementById('cursor');
   W(' -- cursor', cursor);
 
+  function showClick(x, y) {
+    // move the animation to mouse tip
+    var div = $('<div>').css({
+        position: 'absolute',
+        top: y - 11,
+        left: x - 15,
+      'z-index': 10000,
+        'background-image': "-webkit-gradient(radial, 16 37%, 1, 16 37%, 13, from(rgba(0,0,255, 1)), to(rgba(0,0,255,0)))"
+      }).width(30).height(35);
+
+    $('body').append(div);
+
+    div.fadeOut(1000, function () {
+      $(this).remove();
+    });
+  }
+
   setInterval(function () {
     if (i < queue.length) {
-      cursor.style.left = queue[i][0] + "px";
-      cursor.style.top = queue[i][1] + "px";
+      cursor.style.left = (queue[i][0] - queue[i][2]) + "px";
+      cursor.style.top = (queue[i][1] - queue[i][3]) + "px";
       window.scrollTo(queue[i][2], queue[i][3]);
-      i++;
+      if (queue[i][4]) {
+        L('mouse click happened');
+        showClick(queue[i][0], queue[i][1]);
+      }
+      queue = [];
+      i = 0;
     }
-  }, 100);
+  }, 50);
 
   function handleMessage(msg) {
     if (msg.mouse) {
+      if (msg.mouse[4]) {
+        L('mouse click happened');
+      }
       queue.push(msg.mouse);
     } else if (msg.base) {
       W('setting base');
       base = msg.base;
+
+      // TODO: figure out a better way?
+      var m = window.top.document.getElementById('mirror');
+      m.style.width = msg.width;
+      // m.style.height = msg.height;  // height should be dynamic.
     } else if (msg.clear) {
       W('clearing page');
       clearPage();
