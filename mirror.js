@@ -65,12 +65,12 @@ function startMirror() {
   function showClick(x, y) {
     // move the animation to mouse tip
     var div = $('<div>').css({
-        position: 'absolute',
-        top: y - 11,
-        left: x - 15,
+      position: 'absolute',
+      top: y - 11,
+      left: x - 15,
       'z-index': 10000,
-        'background-image': "-webkit-gradient(radial, 16 37%, 1, 16 37%, 13, from(rgba(0,0,255, 1)), to(rgba(0,0,255,0)))"
-      }).width(30).height(35);
+      'background-image': "-webkit-gradient(radial, 16 37%, 1, 16 37%, 13, from(rgba(0,0,255, 1)), to(rgba(0,0,255,0)))"
+    }).width(30).height(35);
 
     $('body').append(div);
 
