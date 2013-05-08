@@ -31,6 +31,7 @@ function L() {
 var files = {
   'mirror.html': ['/mirror.html', 'text/html', null],
   'mirror.js': ['/mirror.js', 'text/javascript', null],
+  'jquery-1.9.1.min.js': ['/jquery-1.9.1.min.js', 'text/javascript', null],
   'tree_mirror.js': ['/tree_mirror.js', 'text/javascript', null],
   'app.js': ['/app.js', 'text/javascript', null],
   'app.css': ['/app.css', 'text/css', null],
