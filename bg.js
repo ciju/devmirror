@@ -37,7 +37,7 @@ function mirrorTab(tabId, wId, force) {
   activeTab = tabId;
   windowId = wId;
 
-  chrome.tabs.executeScript(activeTab, { code: 'startMirroring();' });
+  // chrome.tabs.executeScript(activeTab, { code: 'startMirroring();' });
 }
 
 chrome.tabs.onActivated.addListener(function(selectInfo) {
@@ -57,9 +57,8 @@ chrome.tabs.onUpdated.addListener(function (tid, changeInfo, tab) {
 });
 
 chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
-  a('mirror : '+ mirroring + ' - tab - ' + sender.tab.id + ' - ac - ' + activeTab);
-  if (!mirroring || sender.tab.id !== activeTab)
-    sendResponse({ mirror: false });
-  else
-    sendResponse({ mirror: true });
+  var mirror = false, id = null;
+
+  id = (sender && sender.tab && sender.tab.id) ? sender.tab.id : false;
+  sendResponse({ mirror: (mirroring && id === activeTab)});
 });
