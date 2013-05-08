@@ -1,8 +1,8 @@
+// https://github.com/tboronczyk/JavaScript-Experiments/blob/master/Creepy/index.html
 function recMouseScroll(cfn) {
   var mX = 0,  mY = 0,
       sX = 0,  sY = 0,
-      clk = false,
-      interval = 200,
+      interval = 100,
       recIntv = null,
       b = document.body,
       de = document.documentElement;
@@ -52,7 +52,6 @@ function recMouseScroll(cfn) {
   if (recIntv === null) {
     recIntv = setInterval(function () {
       cfn([mX, mY, sX, sY, false]);
-      clk = false;
     }, interval);
   }
 
