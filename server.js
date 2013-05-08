@@ -29,13 +29,13 @@ function L() {
 }
 
 var files = {
-  'mirror.html': ['/mirror.html', 'text/html', null],
-  'mirror.js': ['/mirror.js', 'text/javascript', null],
-  'jquery-1.9.1.min.js': ['/jquery-1.9.1.min.js', 'text/javascript', null],
-  'tree_mirror.js': ['/tree_mirror.js', 'text/javascript', null],
-  'app.js': ['/app.js', 'text/javascript', null],
-  'app.css': ['/app.css', 'text/css', null],
-  'public/cursor.png': ['/cursor.png', 'image/png', null]
+  'client/mirror.html': ['/mirror.html', 'text/html', null],
+  'client/mirror.js': ['/mirror.js', 'text/javascript', null],
+  'client/jquery-1.9.1.min.js': ['/jquery-1.9.1.min.js', 'text/javascript', null],
+  'client/app.js': ['/app.js', 'text/javascript', null],
+  'client/app.css': ['/app.css', 'text/css', null],
+  'client/cursor.png': ['/cursor.png', 'image/png', null],
+  'tree_mirror.js': ['/tree_mirror.js', 'text/javascript', null]
 };
 
 // TODO: if this doesn't finish before server gets a request, then we
@@ -49,7 +49,7 @@ for (var file in files) {
   })(file);
 }
 
-fs.readFile('index.html', function (err, indexHTML) {
+fs.readFile('client/index.html', function (err, indexHTML) {
   server.addListener('request', function (request, response) {
     for (var f in files) {
       if (request.url == files[f][0]) {
@@ -108,9 +108,9 @@ server.addListener('upgrade', function(request, rawsocket, head) {
 
 
     socket.onmessage = function(event) {
-      L('PROJ: message received. now at ' +
-                  proj.messages.length +
-                  ' . sending to ' + proj.receivers.length);
+      // L('PROJ: message received. now at ' +
+      //             proj.messages.length +
+      //             ' . sending to ' + proj.receivers.length);
       proj.receivers.forEach(function(receiver) {
         receiver.send(event.data);
       });
