@@ -26,9 +26,9 @@ xhr.onreadystatechange = function() {
     var serverURL = xhr.responseText;
 
     serverURL = 'ws://'+serverURL+'/projector';
-    window.addEventListener('load', function () {
-      onLoad(serverURL);
-    });
+    console.log('serverURL', serverURL);
+
+    onLoad(serverURL);
   }
 };
 xhr.send();
