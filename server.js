@@ -35,7 +35,7 @@ var files = {
   'client/app.js': ['/app.js', 'text/javascript', null],
   'client/app.css': ['/app.css', 'text/css', null],
   'client/cursor.png': ['/cursor.png', 'image/png', null],
-  'tree_mirror.js': ['/tree_mirror.js', 'text/javascript', null]
+  'extension/tree_mirror.js': ['/tree_mirror.js', 'text/javascript', null]
 };
 
 // TODO: if this doesn't finish before server gets a request, then we
