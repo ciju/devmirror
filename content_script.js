@@ -50,7 +50,10 @@ function startMirroring(serverURL) {
   var mirrorClient;
 
   socket.onopen = function() {
-    socketSend({ base: location.href.match(/^(.*\/)[^\/]*$/)[1] });
+    socketSend({ base: location.href.match(/^(.*\/)[^\/]*$/)[1],
+                 width: window.innerWidth,
+                 height: window.innerHeight
+               });
     mirrorClient = new TreeMirrorClient(document, {
       initialize: function(rootId, children) {
         socketSend({
