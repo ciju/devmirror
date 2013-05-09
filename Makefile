@@ -1,4 +1,4 @@
-REPO_PATH = /Users/ciju/repos/go/ideas/asideas/src/github.com/ciju/devmirror-server
+REPO_PATH = $(shell pwd)
 EXTENSION_PATH = $(REPO_PATH)/extension
 KEY=$(REPO_PATH)/key.pem
 

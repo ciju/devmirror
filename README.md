@@ -1,2 +1,2 @@
-devmirror-server
-================
+devmirror
+=========

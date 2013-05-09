@@ -140,7 +140,7 @@ option -sc to continue with this version.
 
 	go func() {
 		// download the extension from github.
-		giturl := "https://github.com/ciju/devmirror-server/raw/master/packed-extension"
+		giturl := "https://github.com/ciju/devmirror/raw/master/packed-extension"
 
 		dwndext(giturl+"/devmirror.crx", lpath+"/devmirror.crx")
 
