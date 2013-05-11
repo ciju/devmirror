@@ -18,7 +18,7 @@ var SLIDE_CONFIG = {
 
   // Author information
   presenters: [{
-    name: 'ciju @ { twitter, github, activesphere.com }',
+    name: 'ciju @ { twitter, github, activesphere }.com',
     company: ''
     // gplus: 'http://plus.google.com/1234567890',
     // twitter: '@yourhandle',
