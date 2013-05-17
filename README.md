@@ -1,9 +1,7 @@
 devmirror
 =========
 
-If you want to use this tool, please go to
-[ciju.in/devmirror](http://ciju.in/devmirror). This document is for
-developers interested in devmirror.
+NOTE: Documentation needs quite some work.
 
 devmirror is a way to see and inspect (with chrome devtools) a remote
 users session. 
